@@ -51,6 +51,26 @@ defmodule Assertion.Test do
       """
     }
   end
+  def assert(:===, lhs, rhs) when lhs === rhs do
+    :ok
+  end
+  def assert(:===, lhs, rhs) do
+    {:fail, """
+      Expected: #{lhs}
+      to be exactly equal to: #{rhs}
+      """
+    }
+  end
+  def assert(:!=, lhs, rhs) when lhs != rhs do
+    :ok
+  end
+  def assert(:!=, lhs, rhs) do
+    {:fail, """
+      Expected: #{lhs}
+      not to be equal to: #{rhs}
+      """
+    }
+  end
   def assert(:>, lhs, rhs) when lhs > rhs do
     :ok
   end
@@ -59,6 +79,36 @@ defmodule Assertion.Test do
       Expected: #{lhs}
       to be greater than: #{rhs}
       """
+    }
+  end
+  def assert(:>=, lhs, rhs) when lhs >= rhs do
+    :ok
+  end
+  def assert(:>=, lhs, rhs) do
+    {:fail, """
+        Expected: #{lhs}
+        to be equal to or greater than: #{rhs}
+        """
+    }
+  end
+  def assert(:<, lhs, rhs) when lhs < rhs do
+    :ok
+  end
+  def assert(:<, lhs, rhs) do
+    {:fail, """
+      Expected: #{lhs}
+      to be less than: #{rhs}
+      """
+    }
+  end
+  def assert(:<=, lhs, rhs) when lhs <= rhs do
+    :ok
+  end
+  def assert(:<=, lhs, rhs) do
+    {:fail, """
+        Expected: #{lhs}
+        to be equal to or greater than: #{rhs}
+        """
     }
   end
 end
