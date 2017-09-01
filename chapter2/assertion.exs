@@ -22,12 +22,18 @@ defmodule Assertion do
   end
   defmacro assert({opr, _, [lhs, rhs]}) do
     quote bind_quoted: [opr: opr, lhs: lhs, rhs: rhs] do
-      Assertion.Test.assert(opr, lhs, rhs, :assert)
+      receive do
+        {sender} -> send sender,
+          Assertion.Test.assert(opr, lhs, rhs, :assert)
+      end
     end
   end
   defmacro refute({opr, _, [lhs, rhs]}) do
     quote bind_quoted: [opr: opr, lhs: lhs, rhs: rhs] do
-      Assertion.Test.assert(opr, lhs, rhs, :refute)
+      receive do
+        {sender} -> send sender,
+          Assertion.Test.assert(opr, lhs, rhs, :refute)
+      end
     end
   end
 end
@@ -36,7 +42,14 @@ defmodule Assertion.Test do
   @fail "It must be false or nil"
   def run(tests, module) do
     Enum.each tests, fn {test_func, description} ->
-      case apply(module, test_func, []) do
+      pid = spawn(module, test_func, [])
+      render_via_process(pid, description)
+    end
+  end
+  def render_via_process(pid, description) do
+    send pid, {self}
+    try do
+      receive do
         :ok -> IO.write "."
         {:fail, reason} -> IO.puts """
 
@@ -45,7 +58,12 @@ defmodule Assertion.Test do
           =======================
           #{reason}
           """
+        after 500 ->
+          throw :break
       end
+      render_via_process(pid, description)
+    catch
+      :break -> :ok
     end
   end
   def check(boolean, label) do
