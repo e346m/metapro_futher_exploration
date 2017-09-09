@@ -1,0 +1,6 @@
+application/javascript; .js
+application/json; .json
+image/png; .png
+image/jpeg; .jpg, .jpeg
+video/jpeg; .jpgv
+text/html; .html
